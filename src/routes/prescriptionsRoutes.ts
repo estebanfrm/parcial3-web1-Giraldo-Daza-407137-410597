@@ -11,23 +11,45 @@ import {
 
 const router = Router();
 
-// POST /api/prescriptions
+// GET /api/prescriptions  -> lista todas con sus items
+router.get("/", (req: Request, res: Response) => {
+    const result = prescriptions.map((p) => ({
+        ...p,
+        items: prescriptionItems.filter((pi) => pi.prescriptionId === p.id),
+    }));
+
+    res.json(result);
+});
+
+// GET /api/prescriptions/:id -> una prescripción con sus items
+router.get("/:id", (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    const prescription = prescriptions.find((p) => p.id === id);
+
+    if (!prescription) {
+        return res.status(404).json({ message: "Prescription not found" });
+    }
+
+    const items = prescriptionItems.filter(
+        (pi) => pi.prescriptionId === prescription.id
+    );
+
+    res.json({
+        ...prescription,
+        items,
+    });
+});
+
+// POST /api/prescriptions -> crear
 router.post("/", (req: Request, res: Response) => {
     const { patientId, medicalStaffId, notes, items } = req.body;
 
-    if (
-        !patientId ||
-        !medicalStaffId ||
-        !Array.isArray(items) ||
-        items.length === 0
-    ) {
+    if (!patientId || !medicalStaffId) {
         return res.status(400).json({
-            message:
-                "patientId, medicalStaffId and items (non empty array) are required",
+            message: "patientId and medicalStaffId are required",
         });
     }
 
-    // Validaciones básicas
     const patientExists = patients.some((p) => p.id === patientId);
     const staffExists = staff.some((s) => s.id === medicalStaffId);
 
@@ -40,12 +62,15 @@ router.post("/", (req: Request, res: Response) => {
             .json({ message: "Medical staff does not exist" });
     }
 
-    for (const item of items) {
+    // items son opcionales; si vienen, se validan
+    const itemsArray = Array.isArray(items) ? items : [];
+
+    for (const item of itemsArray) {
         if (
             !item.medicationId ||
             !item.schedule ||
             !item.quantity ||
-            !item.durationDays
+            typeof item.durationDays !== "number"
         ) {
             return res.status(400).json({
                 message:
@@ -66,7 +91,7 @@ router.post("/", (req: Request, res: Response) => {
         notes,
     });
 
-    const createdItems = items.map((item: any) =>
+    const createdItems = itemsArray.map((item: any) =>
         createPrescriptionItem({
             prescriptionId: prescription.id,
             medicationId: item.medicationId,
@@ -82,7 +107,29 @@ router.post("/", (req: Request, res: Response) => {
     });
 });
 
-// GET /api/patients/:patientId/prescriptions
+// DELETE /api/prescriptions/:id -> eliminar prescripción y sus items
+router.delete("/:id", (req: Request, res: Response) => {
+    const id = Number(req.params.id);
+    const index = prescriptions.findIndex((p) => p.id === id);
+
+    if (index === -1) {
+        return res.status(404).json({ message: "Prescription not found" });
+    }
+
+    // eliminar prescripción
+    prescriptions.splice(index, 1);
+
+    // eliminar items asociados
+    for (let i = prescriptionItems.length - 1; i >= 0; i--) {
+        if (prescriptionItems[i].prescriptionId === id) {
+            prescriptionItems.splice(i, 1);
+        }
+    }
+
+    res.status(204).send();
+});
+
+// GET /api/prescriptions/patient/:patientId -> lista por paciente
 router.get("/patient/:patientId", (req: Request, res: Response) => {
     const patientId = Number(req.params.patientId);
 

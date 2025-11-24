@@ -3,8 +3,8 @@ export interface Patient {
     firstName: string;
     lastName: string;
     documentNumber: string;
-    birthDate?: string; // ISO string
+    birthDate?: string; // Formato ISO: YYYY-MM-DD
     phone?: string;
     address?: string;
-    createdAt: string; // ISO date-time
+    createdAt: string; // Fecha de creación en formato ISO
 }
