@@ -1,0 +1,299 @@
+openapi: 3.0.3
+info:
+  title: Gestor de Medicamentos y Pacientes
+  description: API para administrar pacientes, personal médico, medicamentos y prescripciones.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /patients:
+    get:
+      summary: Obtener todos los pacientes
+      tags: [Patients]
+      responses:
+        "200":
+          description: Lista de pacientes
+    post:
+      summary: Crear un paciente
+      tags: [Patients]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/PatientInput'
+      responses:
+        "201":
+          description: Paciente creado
+
+  /patients/{id}:
+    get:
+      summary: Obtener un paciente por ID
+      tags: [Patients]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Paciente encontrado
+    put:
+      summary: Actualizar un paciente
+      tags: [Patients]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientInput'
+      responses:
+        "200":
+          description: Paciente actualizado
+    delete:
+      summary: Eliminar un paciente
+      tags: [Patients]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Eliminado
+
+  # PERSONAL MÉDICO
+  /medical-staff:
+    get:
+      summary: Obtener todo el personal médico
+      tags: [Medical Staff]
+      responses:
+        "200":
+          description: Lista del personal
+    post:
+      summary: Crear registro de personal médico
+      tags: [Medical Staff]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalStaffInput'
+      responses:
+        "201":
+          description: Personal creado
+
+  /medical-staff/{id}:
+    get:
+      summary: Obtener personal médico por ID
+      tags: [Medical Staff]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Registro encontrado
+    put:
+      summary: Actualizar personal médico
+      tags: [Medical Staff]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicalStaffInput'
+      responses:
+        "200":
+          description: Actualizado
+    delete:
+      summary: Eliminar personal médico
+      tags: [Medical Staff]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Eliminado
+
+  # MEDICAMENTOS
+  /medications:
+    get:
+      summary: Obtener todos los medicamentos
+      tags: [Medications]
+      responses:
+        "200":
+          description: Lista de medicamentos
+    post:
+      summary: Crear un medicamento
+      tags: [Medications]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicationInput'
+      responses:
+        "201":
+          description: Medicamento creado
+
+  /medications/{id}:
+    get:
+      summary: Obtener medicamento por ID
+      tags: [Medications]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Medicamento encontrado
+    put:
+      summary: Actualizar medicamento
+      tags: [Medications]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicationInput'
+      responses:
+        "200":
+          description: Actualizado
+    delete:
+      summary: Eliminar medicamento
+      tags: [Medications]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Eliminado
+
+  # PRESCRIPCIONES
+  /prescriptions:
+    get:
+      summary: Obtener todas las prescripciones
+      tags: [Prescriptions]
+      responses:
+        "200":
+          description: Lista de prescripciones
+    post:
+      summary: Crear una prescripción
+      tags: [Prescriptions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrescriptionInput'
+      responses:
+        "201":
+          description: Prescripción creada
+
+  /prescriptions/{id}:
+    get:
+      summary: Obtener una prescripción por ID
+      tags: [Prescriptions]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Encontrada
+    delete:
+      summary: Eliminar una prescripción
+      tags: [Prescriptions]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: Eliminada
+
+components:
+  schemas:
+    PatientInput:
+      type: object
+      required: [firstName, lastName, documentNumber]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        documentNumber:
+          type: string
+        birthDate:
+          type: string
+        phone:
+          type: string
+        address:
+          type: string
+
+    MedicalStaffInput:
+      type: object
+      required: [firstName, lastName, role]
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+        specialty:
+          type: string
+        licenseId:
+          type: string
+
+    MedicationInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        manufacturer:
+          type: string
+        presentation:
+          type: string
+        dosageInfo:
+          type: string
+
+    PrescriptionInput:
+      type: object
+      required: [patientId, medicalStaffId]
+      properties:
+        patientId:
+          type: integer
+        medicalStaffId:
+          type: integer
+        notes:
+          type: string
